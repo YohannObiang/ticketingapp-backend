@@ -7,7 +7,7 @@ var mysql = require("mysql");
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-
+const moment = require('moment');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -62,15 +62,7 @@ app.post('/uploadfile', upload.single('dataFile'), (req, res, next) => {
    return res.send({ message: 'File uploaded successfully.', file });
 });
 
-// Lister les evenements
-app.get('/evenements', (req, res)=>{
-    
-    con.query('SELECT * FROM evenements',(err,result)=>{
-        if(err) res.status(500).send(err)
-        
-        res.status(200).json(result)
-    })
-})
+
 
 // Lister les organisateurs
 app.get('/organisateurs', (req, res)=>{
@@ -81,6 +73,59 @@ app.get('/organisateurs', (req, res)=>{
         res.status(200).json(result)
     })
 })
+
+// Lister les evenements
+app.get('/evenements', (req, res) => {
+  const query = 'SELECT * FROM evenements';
+
+  con.query(query, (err, rows) => {
+    if (err) {
+      console.error('Erreur lors de l\'exécution de la requête :', err);
+      res.status(500).json({ error: 'Erreur serveur' });
+      return;
+    }
+
+    // Formatage des dates au format "JJ-MM-AAAA HH-MM"
+    const formattedRows = rows.map(row => {
+      const formattedDate = moment(row.date).format('DD-MM-YYYY à HH:mm');
+      return { ...row, date: formattedDate };
+    });
+
+    res.json(formattedRows);
+  });
+});
+
+
+  // Route GET pour récupérer les éléments de la base de données
+//   app.get('/elements', (req, res) => {
+//     // Requête SQL pour sélectionner les éléments
+//     const sql = 'SELECT * FROM evenements';
+  
+//     // Exécution de la requête
+//     con.query(sql, (err, results) => {
+//       if (err) {
+//         console.error('Erreur lors de l\'exécution de la requête :', err);
+//         res.status(500).send('Erreur du serveur');
+//         return;
+//       }
+  
+//       // Formater l'attribut de type DATETIME
+//       const formattedResults = results.map((row) => {
+//         // Vous pouvez utiliser la librairie moment.js ou d'autres méthodes pour formater la date
+//         const formattedDateTime = `${row.date.getDate()}-${row.date.getMonth() + 1}-${row.date.getFullYear()} ${row.date.getHours()}:${row.datetime_field.getMinutes()}`;
+  
+//         // Retourner une nouvelle version de l'objet avec la date formatée
+//         return {
+//           ...row,
+//           datetime_field: formattedDateTime
+//         };
+//       });
+  
+//       // Renvoyer les résultats formatés en tant que réponse JSON
+//       res.json(formattedResults);
+//     });
+//   });
+  
 
 // Lister les categories de billet d'un evenement
 app.get('/categoriesbillet/evenement/:id', (req, res)=>{
@@ -93,15 +138,47 @@ app.get('/categoriesbillet/evenement/:id', (req, res)=>{
 })
 
 // Lister les categories de billet d'un evenement
-app.get('/onspot', (req, res)=>{
-    
-    con.query('SELECT * FROM evenements WHERE onspot=1',(err,result)=>{
-        if(err) res.status(500).send(err)
-        
-        res.status(200).json(result)
-    })
-})
+app.get('/onspot', (req, res) => {
+    const query = 'SELECT * FROM evenements WHERE onspot=1';
+  
+    con.query(query, (err, rows) => {
+      if (err) {
+        console.error('Erreur lors de l\'exécution de la requête :', err);
+        res.status(500).json({ error: 'Erreur serveur' });
+        return;
+      }
+  
+      // Formatage des dates au format "JJ-MM-AAAA HH-MM"
+      const formattedRows = rows.map(row => {
+        const formattedDate = moment(row.date).format('DD-MM-YYYY à HH:mm');
+        return { ...row, date: formattedDate };
+      });
+  
+      res.json(formattedRows);
+    });
+  });
 
+  // Tri des evenements par categorie
+app.get('/closestevents', (req, res) => {
+  const query = 'SELECT * FROM evenements ORDER BY date';
+
+  con.query(query, (err, rows) => {
+    if (err) {
+      console.error('Erreur lors de l\'exécution de la requête :', err);
+      res.status(500).json({ error: 'Erreur serveur' });
+      return;
+    }
+
+    // Formatage des dates au format "JJ-MM-AAAA HH-MM"
+    const formattedRows = rows.map(row => {
+      const formattedDate = moment(row.date).format('DD-MM-YYYY à HH:mm');
+      return { ...row, date: formattedDate };
+    });
+
+    res.json(formattedRows);
+  });
+});
+  
 // Lister les categories de billet
 app.get('/categoriesbillet', (req, res)=>{
     
