@@ -92,6 +92,16 @@ app.get('/categoriesbillet/evenement/:id', (req, res)=>{
     })
 })
 
+// Lister les categories de billet d'un evenement
+app.get('/onspot', (req, res)=>{
+    
+    con.query('SELECT * FROM evenements WHERE onspot=1',(err,result)=>{
+        if(err) res.status(500).send(err)
+        
+        res.status(200).json(result)
+    })
+})
+
 // Lister les categories de billet
 app.get('/categoriesbillet', (req, res)=>{
     
