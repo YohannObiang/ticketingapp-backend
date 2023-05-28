@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : sam. 27 mai 2023 à 19:01
+-- Généré le : dim. 28 mai 2023 à 18:27
 -- Version du serveur : 10.4.25-MariaDB
 -- Version de PHP : 8.1.10
 
@@ -20,6 +20,25 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `ebillet`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `billetsvendus`
+--
+
+CREATE TABLE `billetsvendus` (
+  `id_billetvendu` int(20) NOT NULL,
+  `id_evenement` int(11) NOT NULL,
+  `id_categoriebillet` int(11) NOT NULL,
+  `categoriebillet` varchar(50) NOT NULL,
+  `prix` int(15) NOT NULL,
+  `nom_acheteur` varchar(50) NOT NULL,
+  `prenom_acheteur` varchar(50) NOT NULL,
+  `email_acheteur` varchar(50) NOT NULL,
+  `whatsapp_acheteur` int(50) NOT NULL,
+  `date_achat` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -154,6 +173,14 @@ INSERT INTO `organisateurs` (`id_organisateur`, `email`, `password`) VALUES
 --
 
 --
+-- Index pour la table `billetsvendus`
+--
+ALTER TABLE `billetsvendus`
+  ADD PRIMARY KEY (`id_billetvendu`) USING BTREE,
+  ADD KEY `id_evenement` (`id_evenement`),
+  ADD KEY `id_categoriebillet` (`id_categoriebillet`);
+
+--
 -- Index pour la table `categoriesbillet`
 --
 ALTER TABLE `categoriesbillet`
@@ -186,6 +213,12 @@ ALTER TABLE `organisateurs`
 --
 
 --
+-- AUTO_INCREMENT pour la table `billetsvendus`
+--
+ALTER TABLE `billetsvendus`
+  MODIFY `id_billetvendu` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
 -- AUTO_INCREMENT pour la table `categoriesbillet`
 --
 ALTER TABLE `categoriesbillet`
@@ -212,6 +245,13 @@ ALTER TABLE `organisateurs`
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `billetsvendus`
+--
+ALTER TABLE `billetsvendus`
+  ADD CONSTRAINT `billetsvendus_ibfk_1` FOREIGN KEY (`id_evenement`) REFERENCES `evenements` (`id_evenement`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `billetsvendus_ibfk_2` FOREIGN KEY (`id_categoriebillet`) REFERENCES `categoriesbillet` (`id_categoriesBillet`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `categoriesbillet`

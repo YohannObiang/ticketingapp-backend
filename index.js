@@ -35,10 +35,10 @@ const con = mysql.createPool({
     connectionLimit : 100,
     waitForConnections : true,
     queueLimit :0,
-    host     : 'db4free.net',
-    user     : 'yohannobiang',
-    password : '@Bolo1997',
-    database : 'obisto',
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database : 'ebillet',
     debug    :  true,
     wait_timeout : 28800,
     connect_timeout :10
@@ -74,6 +74,8 @@ app.get('/organisateurs', (req, res)=>{
     })
 })
 
+
+
 // Lister les evenements
 app.get('/evenements', (req, res) => {
   const query = 'SELECT * FROM evenements';
@@ -95,37 +97,29 @@ app.get('/evenements', (req, res) => {
   });
 });
 
+// Lister les billets vendus
+app.get('/billetsvendus', (req, res) => {
+  const query = 'SELECT * FROM billetsvendus';
 
-  // Route GET pour récupérer les éléments de la base de données
-//   app.get('/elements', (req, res) => {
-//     // Requête SQL pour sélectionner les éléments
-//     const sql = 'SELECT * FROM evenements';
-  
-//     // Exécution de la requête
-//     con.query(sql, (err, results) => {
-//       if (err) {
-//         console.error('Erreur lors de l\'exécution de la requête :', err);
-//         res.status(500).send('Erreur du serveur');
-//         return;
-//       }
-  
-//       // Formater l'attribut de type DATETIME
-//       const formattedResults = results.map((row) => {
-//         // Vous pouvez utiliser la librairie moment.js ou d'autres méthodes pour formater la date
-//         const formattedDateTime = `${row.date.getDate()}-${row.date.getMonth() + 1}-${row.date.getFullYear()} ${row.date.getHours()}:${row.datetime_field.getMinutes()}`;
-  
-//         // Retourner une nouvelle version de l'objet avec la date formatée
-//         return {
-//           ...row,
-//           datetime_field: formattedDateTime
-//         };
-//       });
-  
-//       // Renvoyer les résultats formatés en tant que réponse JSON
-//       res.json(formattedResults);
-//     });
-//   });
-  
+  con.query(query, (err, rows) => {
+    if (err) {
+      console.error('Erreur lors de l\'exécution de la requête :', err);
+      res.status(500).json({ error: 'Erreur serveur' });
+      return;
+    }
+
+    // Formatage des dates au format "JJ-MM-AAAA HH-MM"
+    const formattedRows = rows.map(row => {
+      const formattedDateAchat = moment(row.date_achat).format('DD-MM-YYYY à HH:mm');
+      return { ...row, date_achat: formattedDateAchat};
+    });
+
+    res.json(formattedRows);
+  });
+});
+
+
+
 
 // Lister les categories de billet d'un evenement
 app.get('/categoriesbillet/evenement/:id', (req, res)=>{
@@ -137,7 +131,7 @@ app.get('/categoriesbillet/evenement/:id', (req, res)=>{
     })
 })
 
-// Lister les categories de billet d'un evenement
+// Lister les evenements onspot
 app.get('/onspot', (req, res) => {
     const query = 'SELECT * FROM evenements WHERE onspot=1';
   
@@ -189,6 +183,17 @@ app.get('/categoriesbillet', (req, res)=>{
     })
 })
 
+// Lister les details d'une categorie de billet
+app.get('/categoriesbillet/:id', (req, res)=>{
+    
+  con.query('SELECT * FROM categoriesbillet WHERE id_categoriesbillet=?',[req.params.id],(err,result)=>{
+      if(err) res.status(500).send(err)
+      
+      res.status(200).json(result)
+  })
+})
+
+
 // Lister les evenements d'un organisateur
 app.get('/evenements/organisateur/:id', (req, res)=>{
     
@@ -197,6 +202,31 @@ app.get('/evenements/organisateur/:id', (req, res)=>{
         
         res.status(200).json(result)
     })
+})
+
+//Ajouter un billet vendu;
+app.post('/ajout/billetvendu', (req, res)=>{
+
+    const id_evenement = req.body.id_evenement;
+    const id_categoriebillet = req.body.id_categoriebillet;
+    const categoriebillet = req.body.categoriebillet;
+    const prix = req.body.prix;
+    const nom_acheteur = req.body.nom_acheteur;
+    const prenom_acheteur = req.body.prenom_acheteur;
+    const email_acheteur = req.body.email_acheteur;
+    const whatsapp_acheteur = req.body.whatsapp_acheteur;
+    const date_achat = new Date();
+
+  
+  
+  con.query('INSERT INTO billetsvendus VALUES(NULL,?,?,?,?,?,?,?,?,?)',[id_evenement, id_categoriebillet, categoriebillet, prix, nom_acheteur, prenom_acheteur, email_acheteur, whatsapp_acheteur, date_achat],(err,result)=>{
+      if(err)
+  {
+      console.log(err)
+  }else{
+      res.send('POSTED');
+  }
+  })
 })
 
 app.use('/profile', express.static('upload/images'));
