@@ -44,6 +44,19 @@ const con = mysql.createPool({
     connect_timeout :10
 });
 
+// const con = mysql.createPool({
+//   connectionLimit : 100,
+//   waitForConnections : true,
+//   queueLimit :0,
+//   host     : 'localhost',
+//   user     : 'root',
+//   password : '',
+//   database : 'ebillet',
+//   debug    :  true,
+//   wait_timeout : 28800,
+//   connect_timeout :10
+// });
+
 con.getConnection ((err)=>{
     if(err)
     {
@@ -205,9 +218,8 @@ app.get('/evenements/organisateur/:id', (req, res)=>{
 })
 
 //Ajouter un billet vendu;
-app.post('/ajout/billetvendu', (req, res)=>{
-
-    const id_evenement = req.body.id_evenement;
+app.post('/ajout/billetvendu', (req, res) => {
+  const id_evenement = req.body.id_evenement;
     const id_categoriebillet = req.body.id_categoriebillet;
     const categoriebillet = req.body.categoriebillet;
     const prix = req.body.prix;
@@ -217,17 +229,17 @@ app.post('/ajout/billetvendu', (req, res)=>{
     const whatsapp_acheteur = req.body.whatsapp_acheteur;
     const date_achat = new Date();
 
-  
-  
-  con.query('INSERT INTO billetsvendus VALUES(NULL,?,?,?,?,?,?,?,?,?)',[id_evenement, id_categoriebillet, categoriebillet, prix, nom_acheteur, prenom_acheteur, email_acheteur, whatsapp_acheteur, date_achat],(err,result)=>{
-      if(err)
-  {
-      console.log(err)
-  }else{
-      res.send('POSTED');
-  }
-  })
-})
+  con.query('INSERT INTO billetsvendus VALUES(NULL,?,?,?,?,?,?,?,?,?)', [id_evenement, id_categoriebillet, categoriebillet, prix, nom_acheteur, prenom_acheteur, email_acheteur, whatsapp_acheteur, date_achat], (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      const id_billetvendu = result.insertId; // Récupération de l'ID généré
+
+      res.send({ id_billetvendu: id_billetvendu });
+    }
+  });
+});
+
 
 app.use('/profile', express.static('upload/images'));
 
