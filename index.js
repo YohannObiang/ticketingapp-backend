@@ -36,7 +36,7 @@ const con = mysql.createPool({
     waitForConnections : true,
     queueLimit :0,
     host     : 'db4free.net',
-    user     : 'yohannobiang ',
+    user     : 'yohannobiang',
     password : '@Bolo1997',
     database : 'obisto',
     debug    :  true,
