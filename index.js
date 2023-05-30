@@ -8,6 +8,11 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 const moment = require('moment');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const { log } = require('console');
+app.use(express.json());
+
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -31,18 +36,18 @@ app.use(cors())
 app.use(errHandler);
 app.use('/uploads', express.static('uploads'));
 
-const con = mysql.createPool({
-    connectionLimit : 100,
-    waitForConnections : true,
-    queueLimit :0,
-    host     : 'db4free.net',
-    user     : 'yohannobiang',
-    password : '@Bolo1997',
-    database : 'obisto',
-    debug    :  true,
-    wait_timeout : 28800,
-    connect_timeout :10
-});
+  const con = mysql.createPool({
+      connectionLimit : 100,
+      waitForConnections : true,
+      queueLimit :0,
+      host     : 'db4free.net',
+      user     : 'yohannobiang',
+      password : '@Bolo1997',
+      database : 'obisto',
+      debug    :  true,
+      wait_timeout : 28800,
+      connect_timeout :10
+  });
 
 // const con = mysql.createPool({
 //   connectionLimit : 100,
@@ -73,6 +78,66 @@ app.post('/uploadfile', upload.single('dataFile'), (req, res, next) => {
       return res.status(400).send({ message: 'Please upload a file.' });
    }
    return res.send({ message: 'File uploaded successfully.', file });
+});
+
+
+const users = [
+  { id: 1, username: 'john', password: 'secret' } // password: "secret"
+];
+
+// Connexion route
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username);
+  
+  if (!user) {
+    return res.status(401).json({ message: 'Utilisateur non trouvé.' });
+  }
+  
+  // bcrypt.compare(password, user.password, (err, result) => {
+    if (user.password === password) {
+      const token = jwt.sign({ userId: user.id }, 'your-secret-key', { expiresIn: '1h' });
+      return res.json({ message: 'Connexion réussie.', token });
+    } else {
+      return res.status(401).json({ message: 'Mot de passe incorrect.' });
+    }
+  });
+// });
+
+// Déconnexion route (facultative avec JWT)
+// Pour déconnecter un utilisateur avec JWT, vous devez gérer cela côté client en supprimant le JWT stocké.
+
+// Ressource protégée route
+app.get('/api/protected', (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Non autorisé.' });
+  }
+
+  jwt.verify(token, 'your-secret-key', (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Token invalide.' });
+    }
+
+    // Vérification réussie, accédez à la ressource protégée
+    const userId = decoded.userId;
+    // Faites quelque chose avec l'ID de l'utilisateur (par exemple, récupérez les données de l'utilisateur à partir de votre base de données)
+    console.log(userId);
+    res.json({ message: `Ressource protégée accessible. ${userId}` });
+  });
+});
+
+app.post('/api/check-auth', (req, res) => {
+  const { token } = req.body;
+  
+  try {
+    // Vérifier la validité du token JWT
+    const decodedToken = jwt.verify(token, 'your-secret-key');
+    res.json({ valid: true });
+  } catch (error) {
+    res.json({ valid: false });
+  }
 });
 
 
