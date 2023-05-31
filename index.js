@@ -81,13 +81,15 @@ app.post('/uploadfile', upload.single('dataFile'), (req, res, next) => {
 });
 
 
-const users = [
-  { id: 1, username: 'john', password: 'secret' } // password: "secret"
-];
+// const users = [
+//   { id: 1, username: 'john', password: 'secret' } // password: "secret"
+// ];
 
 // Connexion route
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
+ 
+  con.query('SELECT * FROM organisateurs',(err,users)=>{
   const user = users.find(u => u.username === username);
   
   if (!user) {
@@ -96,11 +98,13 @@ app.post('/api/login', (req, res) => {
   
   // bcrypt.compare(password, user.password, (err, result) => {
     if (user.password === password) {
-      const token = jwt.sign({ userId: user.id }, 'your-secret-key', { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user.id }, ';osojfgaw;org9al;srgn;awk4uuv%&*);kljB;jB3Ljhv/}[hH', { expiresIn: '10h' });
       return res.json({ message: 'Connexion réussie.', token });
     } else {
       return res.status(401).json({ message: 'Mot de passe incorrect.' });
     }
+  })
+
   });
 // });
 
@@ -115,7 +119,7 @@ app.get('/api/protected', (req, res) => {
     return res.status(401).json({ message: 'Non autorisé.' });
   }
 
-  jwt.verify(token, 'your-secret-key', (err, decoded) => {
+  jwt.verify(token, ';osojfgaw;org9al;srgn;awk4uuv%&*);kljB;jB3Ljhv/}[hH', (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: 'Token invalide.' });
     }
@@ -123,8 +127,7 @@ app.get('/api/protected', (req, res) => {
     // Vérification réussie, accédez à la ressource protégée
     const userId = decoded.userId;
     // Faites quelque chose avec l'ID de l'utilisateur (par exemple, récupérez les données de l'utilisateur à partir de votre base de données)
-    console.log(userId);
-    res.json({ message: `Ressource protégée accessible. ${userId}` });
+    res.json({ message: userId });
   });
 });
 
@@ -133,8 +136,11 @@ app.post('/api/check-auth', (req, res) => {
   
   try {
     // Vérifier la validité du token JWT
-    const decodedToken = jwt.verify(token, 'your-secret-key');
-    res.json({ valid: true });
+    const decodedToken = jwt.verify(token, ';osojfgaw;org9al;srgn;awk4uuv%&*);kljB;jB3Ljhv/}[hH');
+    const idd = decodedToken
+    console.log(decodedToken);
+    res.json({ valid: true, message: {idd} });
+
   } catch (error) {
     res.json({ valid: false });
   }
