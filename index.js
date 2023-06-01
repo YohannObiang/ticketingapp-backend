@@ -288,6 +288,33 @@ app.get('/evenements/organisateur/:id', (req, res)=>{
     })
 })
 
+app.get('/billetvendu/:id', (req, res)=>{
+    
+  con.query('SELECT * FROM billetsvendus WHERE id_billetvendu=?',[req.params.id],(err,result)=>{
+      if(err) res.status(500).send(err)
+      
+      res.status(200).json(result)
+  })
+})
+  
+
+
+app.put('/update/billetvendu/:id', (req, res)=>{
+
+
+  const id = req.params.id;
+
+  
+  
+  con.query(`UPDATE billetsvendus SET validity = 1 WHERE billetsvendus.id_billetvendu = ${id}`,(err,result)=>{
+      if(err)
+  {
+      console.log(err)
+  }else{
+      res.send('Status updated successfully');
+  }
+  })
+})
 //Ajouter un billet vendu;
 app.post('/ajout/billetvendu', (req, res) => {
   const id_evenement = req.body.id_evenement;
@@ -300,7 +327,7 @@ app.post('/ajout/billetvendu', (req, res) => {
     const whatsapp_acheteur = req.body.whatsapp_acheteur;
     const date_achat = new Date();
 
-  con.query('INSERT INTO billetsvendus VALUES(NULL,?,?,?,?,?,?,?,?,?)', [id_evenement, id_categoriebillet, categoriebillet, prix, nom_acheteur, prenom_acheteur, email_acheteur, whatsapp_acheteur, date_achat], (err, result) => {
+  con.query('INSERT INTO billetsvendus VALUES(NULL,?,?,?,?,?,?,?,?,?,0)', [id_evenement, id_categoriebillet, categoriebillet, prix, nom_acheteur, prenom_acheteur, email_acheteur, whatsapp_acheteur, date_achat], (err, result) => {
     if (err) {
       console.log(err);
     } else {
