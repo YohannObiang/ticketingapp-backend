@@ -277,6 +277,15 @@ app.get('/categoriesbillet/:id', (req, res)=>{
   })
 })
 
+app.get('/evenement/categoriesbillet/:id', (req, res)=>{
+    
+  con.query('SELECT * FROM categoriesbillet WHERE id_evenement=?',[req.params.id],(err,result)=>{
+      if(err) res.status(500).send(err)
+      
+      res.status(200).json(result)
+  })
+})
+
 
 // Lister les evenements d'un organisateur
 app.get('/evenements/organisateur/:id', (req, res)=>{
@@ -291,6 +300,25 @@ app.get('/evenements/organisateur/:id', (req, res)=>{
 app.get('/billetvendu/:id', (req, res)=>{
     
   con.query('SELECT * FROM billetsvendus WHERE id_billetvendu=?',[req.params.id],(err,result)=>{
+      if(err) res.status(500).send(err)
+      
+      res.status(200).json(result)
+  })
+})
+
+
+app.get('/billetsvendus/categoriebillet/:id', (req, res)=>{
+    
+  con.query('SELECT * FROM billetsvendus WHERE id_categoriebillet=?',[req.params.id],(err,result)=>{
+      if(err) res.status(500).send(err)
+      
+      res.status(200).json(result)
+  })
+})
+
+app.get('/billetsvendus/evenement/:id', (req, res)=>{
+    
+  con.query('SELECT * FROM billetsvendus WHERE id_evenement=?',[req.params.id],(err,result)=>{
       if(err) res.status(500).send(err)
       
       res.status(200).json(result)
