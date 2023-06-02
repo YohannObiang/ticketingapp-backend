@@ -10,10 +10,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 const moment = require('moment');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { log } = require('console');
+const nodemailer = require('nodemailer');
 app.use(express.json());
-
-
+const { Readable } = require('stream');
+app.use(express.urlencoded({ extended: true }));
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
        cb(null, 'uploads');
@@ -79,6 +79,80 @@ app.post('/uploadfile', upload.single('dataFile'), (req, res, next) => {
    }
    return res.send({ message: 'File uploaded successfully.', file });
 });
+
+
+app.post('/send-email', async (req, res) => {
+  const  {image}  = req.body;
+  console.log(image.substring(22))
+  // Convertir les données d'image en flux lisible
+  const imageBuffer = Buffer.from(image, 'base64');
+ console.log(Buffer.from(image, 'base64'));
+  // Configurer le transporteur pour l'envoi de courrier électronique (utilisez votre propre configuration ici)
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'yohanndian@gmail.com',
+      pass: 'appjdywalykuvwhv',
+    },
+  });
+
+  const mailOptions = {
+    from: 'yohanndian@gmail.com',
+    to: 'eliejrbil@gmail.com',
+    subject: 'Div en tant que pièce jointe',
+    html: '<p>Cher client, <br></br><br></br>Veuillez trouver en pièce jointe de cet e-mail votre billet électronique. <br></br><br></br> Cordialement, <a href="https://e-billet.ga">E-Billet</a></p>',
+    attachments: [
+      {
+        filename: 'div_capture.png',
+        content: image.substring(22),
+        encoding: 'base64',
+      },
+    ],
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'e-mail.' });
+    } else {
+      console.log('Email sent:', info.response);
+      res.json({ message: 'E-mail envoyé avec succès.' });
+    }
+  });
+});
+
+
+
+
+
+
+
+//   // Configurer le transporteur pour l'envoi de courrier électronique (utilisez votre propre configuration ici)
+//   const transporter = nodemailer.createTransport({
+//     service: 'Gmail',
+//     auth: {
+//       user: 'yohanndian@gmail.com',
+//       pass: 'appjdywalykuvwhv',
+//     },
+//   });
+
+//   const mailOptions = {
+//     from: 'yohanndian@gmail.com',
+//     to: 'eliejrbil@gmail.com',
+//     subject: 'Image capturée',
+//     html: `<img src="${image}" alt="Captured Image" />`,
+//   };
+
+//   transporter.sendMail(mailOptions, (error, info) => {
+//     if (error) {
+//       console.error('Error sending email:', error);
+//       res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'e-mail.' });
+//     } else {
+//       console.log('Email sent:', info.response);
+//       res.json({ message: 'E-mail envoyé avec succès.' });
+//     }
+//   });
+// });
 
 
 // const users = [
