@@ -100,11 +100,11 @@ app.post('/send-email/:email', async (req, res) => {
   const mailOptions = {
     from: 'yohanndian@gmail.com',
     to: mailadress,
-    subject: 'Div en tant que pièce jointe',
+    subject: 'Billet électronique',
     html: '<p>Cher client, <br></br><br></br>Veuillez trouver en pièce jointe de cet e-mail votre billet électronique. <br></br><br></br> Cordialement, <a href="https://e-billet.ga">E-Billet</a></p>',
     attachments: [
       {
-        filename: 'div_capture.png',
+        filename: 'E-Billet.png',
         content: image.substring(22),
         encoding: 'base64',
       },
