@@ -81,8 +81,9 @@ app.post('/uploadfile', upload.single('dataFile'), (req, res, next) => {
 });
 
 
-app.post('/send-email', async (req, res) => {
+app.post('/send-email/:email', async (req, res) => {
   const  {image}  = req.body;
+  const  mailadress  = req.params.email;
   console.log(image.substring(22))
   // Convertir les données d'image en flux lisible
   const imageBuffer = Buffer.from(image, 'base64');
@@ -98,7 +99,7 @@ app.post('/send-email', async (req, res) => {
 
   const mailOptions = {
     from: 'yohanndian@gmail.com',
-    to: 'eliejrbil@gmail.com',
+    to: mailadress,
     subject: 'Div en tant que pièce jointe',
     html: '<p>Cher client, <br></br><br></br>Veuillez trouver en pièce jointe de cet e-mail votre billet électronique. <br></br><br></br> Cordialement, <a href="https://e-billet.ga">E-Billet</a></p>',
     attachments: [
