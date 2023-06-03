@@ -101,7 +101,7 @@ app.post('/send-email/:email', async (req, res) => {
     from: 'yohanndian@gmail.com',
     to: mailadress,
     subject: 'Billet électronique',
-    html: '<p>Cher client, <br></br><br></br>Veuillez trouver en pièce jointe de cet e-mail votre billet électronique. <br></br><br></br> Cordialement, <a href="https://e-billet.ga">E-Billet</a></p>',
+    html: '<p>Cher client, <br></br><br></br>Veuillez trouver en pièce jointe de cet e-mail votre billet électronique. <br></br><br></br> Cordialement, <strong>E-Billet</strong></p>',
     attachments: [
       {
         filename: 'E-Billet.png',
