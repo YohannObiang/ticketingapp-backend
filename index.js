@@ -126,40 +126,6 @@ app.post('/send-email/:email', async (req, res) => {
 
 
 
-
-
-//   // Configurer le transporteur pour l'envoi de courrier électronique (utilisez votre propre configuration ici)
-//   const transporter = nodemailer.createTransport({
-//     service: 'Gmail',
-//     auth: {
-//       user: 'yohanndian@gmail.com',
-//       pass: 'appjdywalykuvwhv',
-//     },
-//   });
-
-//   const mailOptions = {
-//     from: 'yohanndian@gmail.com',
-//     to: 'eliejrbil@gmail.com',
-//     subject: 'Image capturée',
-//     html: `<img src="${image}" alt="Captured Image" />`,
-//   };
-
-//   transporter.sendMail(mailOptions, (error, info) => {
-//     if (error) {
-//       console.error('Error sending email:', error);
-//       res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'e-mail.' });
-//     } else {
-//       console.log('Email sent:', info.response);
-//       res.json({ message: 'E-mail envoyé avec succès.' });
-//     }
-//   });
-// });
-
-
-// const users = [
-//   { id: 1, username: 'john', password: 'secret' } // password: "secret"
-// ];
-
 // Connexion route
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
@@ -311,6 +277,25 @@ app.get('/onspot', (req, res) => {
     });
   });
 
+  app.put('/update/retrait/:id', (req, res)=>{
+
+
+    const solde = req.body.solde;
+    const id = req.params.id;
+
+    
+    
+    con.query(`UPDATE retraits SET solde = ? WHERE retraits.id_retrait = ${id}`,[solde],(err,result)=>{
+        if(err)
+    {
+        console.log(err)
+    }else{
+        res.send('Status updated successfully');
+    }
+    })
+})
+
+
   // Tri des evenements par categorie
 app.get('/closestevents', (req, res) => {
   const query = 'SELECT * FROM evenements ORDER BY date';
@@ -381,6 +366,15 @@ app.get('/billetvendu/:id', (req, res)=>{
   })
 })
 
+app.get('/organisateur/:id', (req, res)=>{
+    
+  con.query('SELECT * FROM organisateurs WHERE id=?',[req.params.id],(err,result)=>{
+      if(err) res.status(500).send(err)
+      
+      res.status(200).json(result)
+  })
+})
+
 
 app.get('/billetsvendus/categoriebillet/:id', (req, res)=>{
     
@@ -417,6 +411,36 @@ app.put('/update/billetvendu/:id', (req, res)=>{
       res.send('Status updated successfully');
   }
   })
+
+
+
+
+})
+
+
+app.put('/update/solde/:id', (req, res)=>{
+
+
+  const id = req.params.id;
+  const solde = req.body.solde;
+      console.log(solde)
+  
+  
+  con.query(`UPDATE organisateurs SET solde = ? WHERE organisateurs.id = ${id}`,[solde],(err,result)=>{
+      if(err)
+  {
+      console.log(err)
+      console.log(solde)
+  }else{
+      res.send('Status updated successfully');
+            console.log(solde)
+
+  }
+  })
+
+
+
+
 })
 //Ajouter un billet vendu;
 app.post('/ajout/billetvendu', (req, res) => {
