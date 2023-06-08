@@ -243,7 +243,25 @@ app.get('/billetsvendus', (req, res) => {
   });
 });
 
+// Lister les retraits d'un organisateur
+app.get('/retraits/organisateur/:id', (req, res) => {
 
+  con.query('SELECT * FROM retraits WHERE id=?',[req.params.id],(err,rows)=>{
+    if (err) {
+      console.error('Erreur lors de l\'exécution de la requête :', err);
+      res.status(500).json({ error: 'Erreur serveur' });
+      return;
+    }
+
+    // Formatage des dates au format "JJ-MM-AAAA HH-MM"
+    const formattedRows = rows.map(row => {
+      const formattedDateAchat = moment(row.date_achat).format('DD-MM-YYYY à HH:mm');
+      return { ...row, date_achat: formattedDateAchat};
+    });
+
+    res.json(formattedRows);
+  });
+});
 
 
 // Lister les categories de billet d'un evenement
