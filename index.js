@@ -483,6 +483,23 @@ app.post('/ajout/billetvendu', (req, res) => {
   });
 });
 
+//Ajouter un retrait;
+app.post('/ajout/retrait', (req, res) => {
+  const id = req.body.id;
+    const date = new Date();
+    const somme = req.body.somme;
+    const solde = req.body.solde;
+    const nouveau_solde = req.body.nouveau_solde;
+
+  con.query('INSERT INTO retraits VALUES(NULL,?,?,?,?,?, "En cours")', [id, date, somme, solde, nouveau_solde], (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+    res.send({ message: "POSTED" });
+    }
+  });
+});
+
 
 app.use('/profile', express.static('upload/images'));
 
