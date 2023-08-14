@@ -41,9 +41,9 @@ app.use('/uploads', express.static('uploads'));
       waitForConnections : true,
       queueLimit :0,
       host     : 'db4free.net',
-      user     : 'yohannobiang',
+      user     : 'ebillet',
       password : '@Bolo1997',
-      database : 'obisto',
+      database : 'ebillet',
       debug    :  true,
       wait_timeout : 28800,
       connect_timeout :10

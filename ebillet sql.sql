@@ -283,14 +283,15 @@ ALTER TABLE `categoriesbillet`
 --
 -- AUTO_INCREMENT pour la table `categoriesevenement`
 --
-ALTER TABLE `categoriesevenement`
+ALTER TABLE `package`
   MODIFY `id_categorieevenement` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT pour la table `evenements`
 --
-ALTER TABLE `evenements`
-  MODIFY `id_evenement` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+ALTER TABLE `package`
+  MODIFY `package_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `active_delivery_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT pour la table `organisateurs`
