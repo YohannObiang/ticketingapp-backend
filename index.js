@@ -435,6 +435,20 @@ app.put('/update/billetvendu/:id', (req, res)=>{
 
 })
 
+// Endpoint pour recevoir le callbackURL
+app.post('/callback', (req, res) => {
+    const { callbackURL } = req.body;
+
+    if (!callbackURL || typeof callbackURL !== 'string') {
+        return res.status(400).send({ message: 'Invalid callbackURL' });
+    }
+
+    console.log(`Callback URL reçu : ${callbackURL}`);
+
+    // Vous pouvez ici sauvegarder ou traiter le callbackURL
+    res.status(200).send({ message: 'Callback URL enregistré avec succès' });
+});
+
 
 app.put('/update/solde/:id', (req, res)=>{
 
