@@ -514,6 +514,20 @@ app.post('/ajout/retrait', (req, res) => {
   });
 });
 
+// Endpoint pour le callback
+app.post('/callback/payment', (req, res) => {
+  const { transactionId, status, amount } = req.body;
+
+  // Traitez les informations reçues (par ex. en les enregistrant dans une base de données)
+  console.log('Callback reçu :', req.body);
+
+  // Répondez pour confirmer la réception du callback
+  res.json({
+    responseCode: 200,
+    transactionId: transactionId,
+  });
+});
+
 
 app.use('/profile', express.static('upload/images'));
 
