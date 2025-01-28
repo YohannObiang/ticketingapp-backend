@@ -528,6 +528,24 @@ app.post('/callback/payment', (req, res) => {
   });
 });
 
+// Endpoint pour recevoir le callback de Renew Secret
+app.post('/callback/renew-secret', (req, res) => {
+  const { operation_account_code, secret_key, expires_in } = req.body;
+
+  // Log des informations reçues
+  console.log('Callback Renew Secret reçu :', req.body);
+
+  // Traitez ici les données reçues, par exemple en les enregistrant dans une base de données
+  // Exemple :
+  // saveSecretKeyToDatabase(operation_account_code, secret_key, expires_in);
+
+  // Confirmez la réception du callback avec un statut HTTP 200
+  res.status(200).json({
+    responseCode: 200,
+    message: 'Callback Renew Secret traité avec succès',
+  });
+});
+
 
 app.use('/profile', express.static('upload/images'));
 
