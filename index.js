@@ -523,7 +523,7 @@ app.post('/callback/payment', (req, res) => {
 
   // Répondez pour confirmer la réception du callback
   res.json({
-    responseCode: 400,
+    responseCode: 200,
     transactionId: transactionId,
   });
 });
