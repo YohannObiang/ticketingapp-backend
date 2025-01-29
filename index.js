@@ -522,10 +522,10 @@ app.post('/callback/payment', (req, res) => {
   console.log('Callback reçu :', req.body);
 
   // Répondez pour confirmer la réception du callback
-  res.json({
-    responseCode: 2000,
-    transactionId: transactionId,
-  });
+  //res.json({
+  // responseCode: 2000,
+  // transactionId: transactionId,
+  //});
 });
 
 // Endpoint pour recevoir le callback de Renew Secret
