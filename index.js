@@ -516,37 +516,7 @@ app.post('/ajout/retrait', (req, res) => {
 });
 
 
-app.locals.paymentStatus = null;
 
-
-app.post('/callback/payment', (req, res) => {
-  const { transactionId, status, amount, customerID, fees, totalAmount, chargeOwner, transactionOperation, operator } = req.body;
-
-  // Vérification que les données essentielles sont présentes
-
-
-  // Traitez les informations reçues (par exemple, en les enregistrant dans une base de données)
-  app.locals.paymentStatus = req.body
-  console.log('Callback reçu :', req.body);
-
-  if (!transactionId || !status || !amount || !customerID) {
-    return res.status(400).json({
-      message: 'Données manquantes ou incorrectes dans le callback',
-    });
-  }
-
-
-  // Exemple d'enregistrement dans la base de données (selon votre modèle)
-  // await saveTransactionToDatabase(req.body);
-
-  // Répondez pour confirmer la réception du callback
-  return res.json({
-    responseCode: 200,
-    transactionId: transactionId,
-    status: status,
-    message: 'Callback traité avec succès',
-  });
-});
 
 
 app.locals.secretKey = null; // Initialiser la clé
@@ -602,6 +572,43 @@ app.post('/api/renew-secret', async (req, res) => {
 
 
 const API_URL = 'https://api.mypvit.pro/0H3U6T5XADVKU6PN/rest';
+
+app.locals.paymentStatus = null;
+
+app.post('/callback/payment', async (req, res) => {
+  try {
+    const { transactionId, status, amount, customerID, fees, totalAmount, chargeOwner, transactionOperation, operator } = req.body;
+
+    console.log('Callback reçu:', req.body);
+
+    // Vérification que les données essentielles sont présentes
+    if (!transactionId || !status || !amount || !customerID) {
+      return res.status(400).json({
+        message: 'Données manquantes ou incorrectes dans le callback',
+      });
+    }
+
+    // Mise à jour de l'état du paiement après validation des données
+    app.locals.paymentStatus = req.body;
+    console.log('Nouvel état du paiement enregistré:', app.locals.paymentStatus);
+
+    // Exemple d'enregistrement dans une base de données (si applicable)
+    // await saveTransactionToDatabase(req.body);
+
+    // Réponse confirmant le traitement du callback
+    return res.status(200).json({
+      responseCode: 200,
+      transactionId: transactionId,
+      status: status,
+      message: 'Callback traité avec succès',
+    });
+
+  } catch (error) {
+    console.error('Erreur lors du traitement du callback:', error);
+    return res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
+});
+
 
 // Route pour traiter la transaction
 app.post("/api/transaction", async (req, res) => {
