@@ -577,10 +577,11 @@ app.locals.paymentStatus = null;
 
 app.post('/callback/payment', async (req, res) => {
   try {
+
+    console.log('Callback reçu:', req.body);    
+    app.locals.paymentStatus = req.body;
+
     const { transactionId, status, amount, customerID, fees, totalAmount, chargeOwner, transactionOperation, operator } = req.body;
-
-    console.log('Callback reçu:', req.body);
-
     // Vérification que les données essentielles sont présentes
     if (!transactionId || !status || !amount || !customerID) {
       return res.status(400).json({
@@ -589,7 +590,6 @@ app.post('/callback/payment', async (req, res) => {
     }
 
     // Mise à jour de l'état du paiement après validation des données
-    app.locals.paymentStatus = req.body;
     console.log('Nouvel état du paiement enregistré:', app.locals.paymentStatus);
 
     // Exemple d'enregistrement dans une base de données (si applicable)
