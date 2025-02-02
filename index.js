@@ -575,40 +575,41 @@ const API_URL = 'https://api.mypvit.pro/0H3U6T5XADVKU6PN/rest';
 
 app.locals.paymentStatus = null;
 
-// Fonction pour attendre que `app.locals.paymentStatus` soit mis à jour
-const waitForPaymentStatus = (timeout = 125000, interval = 5000) => {
-  return new Promise((resolve, reject) => {
-    const startTime = Date.now();
-
-    const checkStatus = () => {
-      if (app.locals.paymentStatus !== null) {
-        return resolve(app.locals.paymentStatus);
-      }
-
-      if (Date.now() - startTime > timeout) {
-        return reject(new Error("Timeout: Aucun paiement reçu"));
-      }
-
-      setTimeout(checkStatus, interval);
-    };
-
-    checkStatus();
-  });
-};
-
-// Route Callback pour recevoir le statut du paiement
-app.post("/callback/payment", async (req, res) => {
+app.post('/callback/payment', async (req, res) => {
+  console.log('Callback reçu:', req.body);    
   app.locals.paymentStatus = req.body;
-  console.log("Callback reçu:", app.locals.paymentStatus);
+  try {
 
 
-  return res.status(200).json({
-    responseCode: 200,
-    transactionId: req.body.transactionId,
-    status: req.body.status,
-    message: "Callback traité avec succès",
-  });
+
+    const { transactionId, status, amount, customerID, fees, totalAmount, chargeOwner, transactionOperation, operator } = req.body;
+    // Vérification que les données essentielles sont présentes
+    if (!transactionId || !status || !amount || !customerID) {
+      return res.status(400).json({
+        message: 'Données manquantes ou incorrectes dans le callback',
+      });
+    }
+
+    // Mise à jour de l'état du paiement après validation des données
+    console.log('Nouvel état du paiement enregistré:', app.locals.paymentStatus);
+    
+    // Exemple d'enregistrement dans une base de données (si applicable)
+    // await saveTransactionToDatabase(req.body);
+
+    // Réponse confirmant le traitement du callback
+    return res.status(200).json({
+      responseCode: 200,
+      transactionId: transactionId,
+      status: status,
+      message: 'Callback traité avec succès',
+    });
+
+  } catch (error) {
+    console.error('Erreur lors du traitement du callback:', error);
+    return res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
 });
+
 
 // Route pour traiter la transaction
 app.post("/api/transaction", async (req, res) => {
@@ -627,6 +628,7 @@ app.post("/api/transaction", async (req, res) => {
       operator_owner_charge: req.body.operator_owner_charge,
       free_info: req.body.free_info,
     };
+    
 
     const headers = {
       "X-Secret": req.body.secretKey,
@@ -634,17 +636,61 @@ app.post("/api/transaction", async (req, res) => {
       "Content-Type": "application/json",
     };
 
-    // Envoi de la requête à l'API externe
     const response = await axios.post(API_URL, transactionData, { headers });
 
-    console.log("Transaction envoyée, en attente du callback...");
+    // res.json(response.data);
 
-    try {
-      const paymentStatus = await waitForPaymentStatus();
-      return res.se({ message: "Paiement reçu", data: paymentStatus });
-    } catch (error) {
-      return res.status(408).json({ message: "Aucun paiement reçu après attente" });
-    }
+      
+      if (app.locals.paymentStatus == null) {
+        
+
+        setTimeout(() => {
+
+          if (app.locals.paymentStatus == null) {
+
+            
+
+            setTimeout(() => {
+
+              
+              if (app.locals.paymentStatus == null) {
+
+                
+
+                setTimeout(() => {
+
+
+                  if (app.locals.paymentStatus == null) {
+
+                    
+
+                    setTimeout(() => {
+                      if (app.locals.paymentStatus == null) {
+                        res.send({message:'No data !'})
+                      }else{
+                        res.send({message: app.locals.paymentStatus})
+                      }
+                      
+                      
+                    }, 40000);
+                  }else{
+                    res.send({message: app.locals.paymentStatus})
+                  }
+                  
+                }, 30000);
+              }else{
+                res.send({message: app.locals.paymentStatus})
+              }
+            }, 30000);
+          }else{
+            res.send({message: app.locals.paymentStatus})
+          }
+        }, 30000);
+      }else{
+        res.send({message: app.locals.paymentStatus})
+      }
+      
+    
   } catch (error) {
     console.error("Erreur lors de l'appel API :", error);
     res.status(error.response?.status || 500).json({ error: error.message });
