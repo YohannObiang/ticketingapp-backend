@@ -3,6 +3,7 @@ const cors = require('cors')
 const app = express()
 const multer = require("multer");
 const path = require("path");
+const axios = require('axios');
 var mysql = require("mysql");
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -528,22 +529,54 @@ app.post('/callback/payment', (req, res) => {
       });
 });
 
-// Endpoint pour recevoir le callback de Renew Secret
+let secretKey = "null"; // Initialiser la clé
+
 app.post('/callback/renew-secret', (req, res) => {
+  console.log("📥 Clé secrète reçue :", req.body);
+
   const { operation_account_code, secret_key, expires_in } = req.body;
 
-  // Log des informations reçues
-  res.send({ message: req.body});
+  if (!operation_account_code || !secret_key || !expires_in) {
+      return res.status(400).json({
+          responseCode: 400,
+          message: "Données manquantes dans le callback",
+          receivedData: req.body,
+      });
+  }
 
-  // Traitez ici les données reçues, par exemple en les enregistrant dans une base de données
-  // Exemple :
-  // saveSecretKeyToDatabase(operation_account_code, secret_key, expires_in);
+  // ✅ Stocker la clé secrète dans une variable (ou une base de données)
+  secretKey = 'secret_key';
+  console.log("🔑 Nouvelle clé stockée :", secretKey);
 
-  // Confirmez la réception du callback avec un statut HTTP 200
   res.status(200).json({
-    responseCode: 200,
-    message: 'Callback Renew Secret traité avec succès',
+      responseCode: 200,
+      message: "Callback Renew Secret traité avec succès",
+      receivedData: { operation_account_code, secret_key, expires_in },
   });
+});
+
+app.post('/api/renew-secret', async (req, res) => {
+  try {
+      const response = await axios.post(
+          'https://api.mypvit.pro/BDNNTIUVGBLANGWF/renew-secret',
+          new URLSearchParams({
+              operationAccountCode: 'ACC_679A0D221A79F',
+              receptionUrlCode: 'V4GY7',
+              password: '@Yodiang97' // ⚠ Remplace par ton mot de passe sécurisé
+          }),
+          {
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+              }
+          }
+      );
+
+      // Renvoi de la réponse API au frontend
+      res.send({message: secretKey});
+  } catch (err) {
+      console.error('❌ Erreur API:', err.response ? err.response.data : err.message);
+      res.status(500).json({ error: err.response ? err.response.data : err.message });
+  }
 });
 
 
