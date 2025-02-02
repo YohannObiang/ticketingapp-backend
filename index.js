@@ -641,7 +641,7 @@ app.post("/api/transaction", async (req, res) => {
 
     try {
       const paymentStatus = await waitForPaymentStatus();
-      return res.json({ message: "Paiement reçu", data: paymentStatus });
+      return res.se({ message: "Paiement reçu", data: paymentStatus });
     } catch (error) {
       return res.status(408).json({ message: "Aucun paiement reçu après attente" });
     }
