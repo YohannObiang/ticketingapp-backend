@@ -515,19 +515,31 @@ app.post('/ajout/retrait', (req, res) => {
   });
 });
 
-// Endpoint pour le callback
 app.post('/callback/payment', (req, res) => {
-  const { transactionId, status, amount } = req.body;
+  const { transactionId, status, amount, customerID, fees, totalAmount, chargeOwner, transactionOperation, operator } = req.body;
 
-  // Traitez les informations reçues (par ex. en les enregistrant dans une base de données)
+  // Vérification que les données essentielles sont présentes
+  if (!transactionId || !status || !amount || !customerID) {
+    return res.status(400).json({
+      message: 'Données manquantes ou incorrectes dans le callback',
+    });
+  }
+
+  // Traitez les informations reçues (par exemple, en les enregistrant dans une base de données)
   console.log('Callback reçu :', req.body);
 
+  // Exemple d'enregistrement dans la base de données (selon votre modèle)
+  // await saveTransactionToDatabase(req.body);
+
   // Répondez pour confirmer la réception du callback
-      res.json({
-      responseCode: 200,
-      transactionId: transactionId,
-      });
+  return res.json({
+    responseCode: 200,
+    transactionId: transactionId,
+    status: status,
+    message: 'Callback traité avec succès',
+  });
 });
+
 
 app.locals.secretKey = null; // Initialiser la clé
 
