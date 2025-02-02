@@ -593,6 +593,45 @@ app.post('/api/renew-secret', async (req, res) => {
 });
 
 
+const API_URL = 'https://api.mypvit.pro/0H3U6T5XADVKU6PN/rest';
+
+// Route pour traiter la transaction
+app.post("/api/transaction", async (req, res) => {
+  try {
+    const transactionData = {
+      agent: req.body.agent,
+      amount: req.body.amount,
+      reference: req.body.reference,
+      product: req.body.product,
+      service: req.body.service,
+      callback_url_code: req.body.callback_url_code,
+      customer_account_number: req.body.customer_account_number,
+      merchant_operation_account_code: req.body.merchant_operation_account_code,
+      transaction_type: req.body.transaction_type,
+      owner_charge: req.body.owner_charge,
+      operator_owner_charge: req.body.operator_owner_charge,
+      free_info: req.body.free_info,
+    };
+    console.log(req.body.secretKey);
+    
+
+    const headers = {
+      "X-Secret": req.body.secretKey,
+      "X-Callback-MediaType": "application/json",
+      "Content-Type": "application/json",
+    };
+
+    const response = await axios.post(API_URL, transactionData, { headers });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("Erreur lors de l'appel API :", error);
+    res.status(error.response?.status || 500).json({ error: error.message });
+  }
+});
+
+
+
 app.use('/profile', express.static('upload/images'));
 
 app.post("/upload", upload.single('profile'), (req, res) => {
