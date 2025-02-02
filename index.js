@@ -576,7 +576,8 @@ const API_URL = 'https://api.mypvit.pro/0H3U6T5XADVKU6PN/rest';
 app.locals.paymentStatus = null;
 
 app.post('/callback/payment', async (req, res) => {
-  
+  console.log('Callback reçu:', req.body);    
+  app.locals.paymentStatus = req.body;
   try {
 
 
@@ -590,10 +591,8 @@ app.post('/callback/payment', async (req, res) => {
     }
 
     // Mise à jour de l'état du paiement après validation des données
-    if (req.body) {
-      console.log('Callback reçu:', req.body);    
-      app.locals.paymentStatus = req.body;
-    }
+    console.log('Nouvel état du paiement enregistré:', app.locals.paymentStatus);
+    
     // Exemple d'enregistrement dans une base de données (si applicable)
     // await saveTransactionToDatabase(req.body);
 
