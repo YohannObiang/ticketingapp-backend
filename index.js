@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
+const axios = require('axios');
 const multer = require("multer");
 const path = require("path");
 var mysql = require("mysql");
@@ -556,6 +557,31 @@ app.post("/upload", upload.single('profile'), (req, res) => {
         // profile_url: `http://localhost:3001/profile/${req.file.filename}`
     })
 })
+
+// Route pour récupérer la clé secrète
+app.post('/api/renew-secret', async (req, res) => {
+    try {
+        const response = await axios.post(
+            'https://api.mypvit.pro/BDNNTIUVGBLANGWF/renew-secret',
+            new URLSearchParams({
+                operationAccountCode: 'ACC_679A0D221A79F',
+                receptionUrlCode: 'V4GY7',
+                password: '@Yodiang97' // ⚠ Remplace par ton mot de passe sécurisé
+            }),
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+        );
+
+        // Renvoi de la réponse API au frontend
+        res.json(response.data);
+    } catch (err) {
+        console.error('❌ Erreur API:', err.response ? err.response.data : err.message);
+        res.status(500).json({ error: err.response ? err.response.data : err.message });
+    }
+});
 
 function errHandler(err, req, res, next) {
     if (err instanceof multer.MulterError) {
