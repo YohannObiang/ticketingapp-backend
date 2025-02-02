@@ -515,18 +515,26 @@ app.post('/ajout/retrait', (req, res) => {
   });
 });
 
+
+app.locals.paymentStatus = null;
+
+
 app.post('/callback/payment', (req, res) => {
   const { transactionId, status, amount, customerID, fees, totalAmount, chargeOwner, transactionOperation, operator } = req.body;
 
   // Vérification que les données essentielles sont présentes
+
+
+  // Traitez les informations reçues (par exemple, en les enregistrant dans une base de données)
+  app.locals.paymentStatus = req.body
+  console.log('Callback reçu :', req.body);
+
   if (!transactionId || !status || !amount || !customerID) {
     return res.status(400).json({
       message: 'Données manquantes ou incorrectes dans le callback',
     });
   }
 
-  // Traitez les informations reçues (par exemple, en les enregistrant dans une base de données)
-  console.log('Callback reçu :', req.body);
 
   // Exemple d'enregistrement dans la base de données (selon votre modèle)
   // await saveTransactionToDatabase(req.body);
@@ -612,7 +620,6 @@ app.post("/api/transaction", async (req, res) => {
       operator_owner_charge: req.body.operator_owner_charge,
       free_info: req.body.free_info,
     };
-    console.log(req.body.secretKey);
     
 
     const headers = {
@@ -623,7 +630,8 @@ app.post("/api/transaction", async (req, res) => {
 
     const response = await axios.post(API_URL, transactionData, { headers });
 
-    res.json(response.data);
+    // res.json(response.data);
+    res.send({message: app.locals.paymentStatus})
   } catch (error) {
     console.error("Erreur lors de l'appel API :", error);
     res.status(error.response?.status || 500).json({ error: error.message });
