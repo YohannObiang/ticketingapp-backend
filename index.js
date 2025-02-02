@@ -529,10 +529,12 @@ app.post('/callback/payment', (req, res) => {
       });
 });
 
-let secretKey = "null"; // Initialiser la clé
+app.locals.secretKey = null; // Initialiser la clé
 
 app.post('/callback/renew-secret', (req, res) => {
-  console.log("📥 Clé secrète reçue :", req.body);
+  console.log("📥 Clé secrète reçue :", req.body.secret_key);
+  app.locals.secretKey = req.body.secret_key;
+
 
   const { operation_account_code, secret_key, expires_in } = req.body;
 
@@ -545,7 +547,6 @@ app.post('/callback/renew-secret', (req, res) => {
   }
 
   // ✅ Stocker la clé secrète dans une variable (ou une base de données)
-  secretKey = 'secret_key';
   console.log("🔑 Nouvelle clé stockée :", secretKey);
 
   res.status(200).json({
@@ -572,7 +573,7 @@ app.post('/api/renew-secret', async (req, res) => {
       );
 
       // Renvoi de la réponse API au frontend
-      res.send({message: secretKey});
+      res.send({message: app.locals.secretKey});
   } catch (err) {
       console.error('❌ Erreur API:', err.response ? err.response.data : err.message);
       res.status(500).json({ error: err.response ? err.response.data : err.message });
