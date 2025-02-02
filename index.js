@@ -576,10 +576,11 @@ const API_URL = 'https://api.mypvit.pro/0H3U6T5XADVKU6PN/rest';
 app.locals.paymentStatus = null;
 
 app.post('/callback/payment', async (req, res) => {
+  console.log('Callback reçu:', req.body);    
+  app.locals.paymentStatus = req.body;
   try {
 
-    console.log('Callback reçu:', req.body);    
-    app.locals.paymentStatus = req.body;
+
 
     const { transactionId, status, amount, customerID, fees, totalAmount, chargeOwner, transactionOperation, operator } = req.body;
     // Vérification que les données essentielles sont présentes
