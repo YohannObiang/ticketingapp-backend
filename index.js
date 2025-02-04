@@ -573,11 +573,11 @@ app.post('/api/renew-secret', async (req, res) => {
 
 const API_URL = 'https://api.mypvit.pro/0H3U6T5XADVKU6PN/rest';
 
-const paymentStatus = null;
+app.locals.paymentStatus = null;
 
 app.post('/callback/payment', async (req, res) => {
   console.log('Callback reçu:', req.body);    
-  paymentStatus = 'req.body';
+  app.locals.paymentStatus = 'req.body';
   try {
 
 
