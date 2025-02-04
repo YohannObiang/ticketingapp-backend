@@ -638,61 +638,7 @@ app.post("/api/transaction", async (req, res) => {
 
     const response = await axios.post(API_URL, transactionData, { headers });
 
-    // res.json(response.data);
-
-      
-      if (app.locals.paymentStatus == null) {
-        console.log('not yet ready')
-
-        setTimeout(() => {
-
-          if (app.locals.paymentStatus == null) {
-
-            console.log('not yet ready')
-
-            setTimeout(() => {
-
-              
-              if (app.locals.paymentStatus == null) {
-
-                console.log('not yet ready')
-
-                setTimeout(() => {
-
-
-                  if (app.locals.paymentStatus == null) {
-
-                    console.log('not yet ready')
-
-                    setTimeout(() => {
-                      if (app.locals.paymentStatus == null) {
-                        res.send({message:'No data !'})
-                        console.log('No data')
-
-                      }else{
-                        res.send({message: app.locals.paymentStatus})
-                        console.log('Data okay')
-
-                      }
-                      
-                      
-                    }, 40000);
-                  }else{
-                    res.send({message: app.locals.paymentStatus})
-                  }
-                  
-                }, 30000);
-              }else{
-                res.send({message: app.locals.paymentStatus})
-              }
-            }, 30000);
-          }else{
-            res.send({message: app.locals.paymentStatus})
-          }
-        }, 30000);
-      }else{
-        res.send({message: app.locals.paymentStatus})
-      }
+    res.json(response.data);
       
     
   } catch (error) {
@@ -700,6 +646,33 @@ app.post("/api/transaction", async (req, res) => {
     res.status(error.response?.status || 500).json({ error: error.message });
   }
 });
+
+app.get('/api/status', async (req, res) => {
+  console.log(req.query);
+  
+  try {
+      const { transactionId, accountOperationCode, transactionOperation, secretKey  } = req.query;
+
+      // Vérification des paramètres
+      if (!transactionId || !accountOperationCode || !transactionOperation) {
+          return res.status(400).json({ error: "Tous les paramètres sont obligatoires." });
+      }
+
+      // Construction de l'URL
+      const url = `https://api.mypvit.pro/QVDO1T26PO4CQYC4/status?transactionId=${transactionId}&accountOperationCode=${accountOperationCode}&transactionOperation=${transactionOperation}`;
+      const response = await axios.get(url, {
+          headers: { 'X-Secret': secretKey }
+      });
+
+      res.json(response.data);
+      console.log(response.data);
+
+  } catch (error) {
+      console.error("Erreur lors de la requête GET STATUS:", error.response?.data || error.message);
+      res.status(error.response?.status || 500).json(error.response?.data || { error: "Erreur serveur." });
+  }
+});
+
 
 
 
