@@ -30,7 +30,7 @@ app.all('/', (req, res) => {
     res.send('Base de donnees connectee')
 })
 
-app.listen(process.env.PORT || 3001)
+app.listen(process.env.PORT || 5000)
 
 app.use(express.json())
 app.use(cors())
@@ -573,11 +573,11 @@ app.post('/api/renew-secret', async (req, res) => {
 
 const API_URL = 'https://api.mypvit.pro/0H3U6T5XADVKU6PN/rest';
 
-app.locals.paymentStatus = null;
+const paymentStatus = null;
 
 app.post('/callback/payment', async (req, res) => {
   console.log('Callback reçu:', req.body);    
-  app.locals.paymentStatus = req.body;
+  paymentStatus = 'req.body';
   try {
 
 
@@ -642,33 +642,37 @@ app.post("/api/transaction", async (req, res) => {
 
       
       if (app.locals.paymentStatus == null) {
-        
+        console.log('not yet ready')
 
         setTimeout(() => {
 
           if (app.locals.paymentStatus == null) {
 
-            
+            console.log('not yet ready')
 
             setTimeout(() => {
 
               
               if (app.locals.paymentStatus == null) {
 
-                
+                console.log('not yet ready')
 
                 setTimeout(() => {
 
 
                   if (app.locals.paymentStatus == null) {
 
-                    
+                    console.log('not yet ready')
 
                     setTimeout(() => {
                       if (app.locals.paymentStatus == null) {
                         res.send({message:'No data !'})
+                        console.log('No data')
+
                       }else{
                         res.send({message: app.locals.paymentStatus})
+                        console.log('Data okay')
+
                       }
                       
                       
