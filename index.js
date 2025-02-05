@@ -5,8 +5,6 @@ const multer = require("multer");
 const path = require("path");
 const axios = require('axios');
 var mysql = require("mysql");
-const EventEmitter = require('events');
-const paymentEmitter = new EventEmitter();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -579,7 +577,7 @@ app.locals.paymentStatus = null;
 
 app.post('/callback/payment', async (req, res) => {
   console.log('Callback reçu:', req.body);    
-  const paymentStatus = req.body.status;
+  app.locals.paymentStatus = 'req.body';
   try {
 
 
@@ -593,10 +591,7 @@ app.post('/callback/payment', async (req, res) => {
     }
 
     // Mise à jour de l'état du paiement après validation des données
-    console.log('Nouvel état du paiement enregistré:', paymentStatus);
-    paymentEmitter.emit('paymentStatus', paymentStatus);
-      res.sendStatus(200);
-
+    console.log('Nouvel état du paiement enregistré:', app.locals.paymentStatus);
     
     // Exemple d'enregistrement dans une base de données (si applicable)
     // await saveTransactionToDatabase(req.body);
@@ -642,12 +637,7 @@ app.post("/api/transaction", async (req, res) => {
     };
 
     const response = await axios.post(API_URL, transactionData, { headers });
-    // Écoute de l'événement de statut de paiement
-    paymentEmitter.once('paymentStatus', (status) => {
-      res.json({ status });
-      console.log(status);
-      
-    });
+
     res.json(response.data);
       
     
