@@ -63,6 +63,14 @@ app.use('/uploads', express.static('uploads'));
 //   connect_timeout :10
 // });
 
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'yohanndian@gmail.com',
+    pass: 'appjdywalykuvwhv',
+  },
+});
+
 con.getConnection ((err)=>{
     if(err)
     {
@@ -90,13 +98,7 @@ app.post('/send-email/:email', async (req, res) => {
   const imageBuffer = Buffer.from(image, 'base64');
  console.log(Buffer.from(image, 'base64'));
   // Configurer le transporteur pour l'envoi de courrier électronique (utilisez votre propre configuration ici)
-  const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: 'yohanndian@gmail.com',
-      pass: 'appjdywalykuvwhv',
-    },
-  });
+  
 
   const mailOptions = {
     from: 'yohanndian@gmail.com',
@@ -672,6 +674,137 @@ app.get('/api/status', async (req, res) => {
       res.status(error.response?.status || 500).json(error.response?.data || { error: "Erreur serveur." });
   }
 });
+
+
+
+
+// Route pour l'inscription
+app.post('/inscription', async (req, res) => {
+  const { email, motDePasse } = req.body;
+  
+  try {
+    const rows = await con.query('SELECT * FROM utilisateurs WHERE email = ?', [email]);
+    if (rows.length > 0) {
+      return res.status(400).json({ message: 'Utilisateur déjà existant' });
+    }
+
+    const motDePasseHache = await bcrypt.hash(motDePasse, 10);
+    await con.query('INSERT INTO utilisateurs (email, mot_de_passe) VALUES (?, ?)', [email, motDePasseHache]);
+
+    res.status(201).json({ message: 'Utilisateur créé avec succès' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur du serveur' });
+  }
+});
+
+// Route pour demander un OTP
+app.post('/demander-otp', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const rows = await con.query('SELECT * FROM utilisateurs WHERE email = ?', [email]);
+    if (rows.length === 0) {
+      return res.status(400).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiration = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    await con.query('UPDATE utilisateurs SET otp = ?, otp_expiration = ? WHERE email = ?', [otp, otpExpiration, email]);
+
+    const mailOptions = {
+      from: 'yohanndian@gmail.com',
+      to: email,
+      subject: 'Votre code OTP',
+      text: `Votre code OTP est : ${otp}. Il est valide pendant 30 minutes.`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'e-mail' });
+      } else {
+        res.status(200).json({ message: 'OTP envoyé avec succès' });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur du serveur' });
+  }
+});
+
+// Route pour vérifier l'OTP
+app.post('/verifier-otp', async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    con.query('SELECT * FROM utilisateurs WHERE email=?',[email ],(err,result)=>{
+
+      if (!result[0] || result[0].otp !== otp || new Date(result[0].otp_expiration) < new Date()) {
+        return res.status(400).json({ message: 'OTP invalide ou expiré' });
+      }
+  
+      // Génération du token JWT
+      const token = jwt.sign({ email }, 'jhh2o22hp998h2g9q920u09', { expiresIn: '1h' });
+  
+      // Réinitialisation de l'OTP
+      con.query('UPDATE utilisateurs SET otp = NULL, otp_expiration = NULL WHERE email = ?', [email]);
+  
+      res.status(200).json({ message: 'OTP vérifié avec succès', token });
+
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur du serveur' });
+  }
+});
+
+// Middleware d'authentification
+const authentification = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Accès refusé' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Token invalide' });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// Route protégée par le middleware d'authentification
+app.get('/tableau-de-bord', authentification, (req, res) => {
+  res.status(200).json({ message: 'Bienvenue sur votre tableau de bord' });
+});
+
+
+app.get('/billets-achetes/:email', (req, res) => {
+  const email = req.params.email;
+
+  if (!email) {
+    return res.status(400).json({ message: 'L\'adresse e-mail est requise.' });
+  }
+
+  const query = `
+    SELECT DISTINCT id_evenement, email_acheteur
+    FROM billetsvendus
+    WHERE email_acheteur = ?
+  `;
+
+  con.query(query, [email], (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des billets :', err.stack);
+      return res.status(500).json({ message: 'Erreur serveur lors de la récupération des billets.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Aucun billet trouvé pour cet acheteur.' });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
 
 
 
