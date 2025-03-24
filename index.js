@@ -321,25 +321,25 @@ app.get('/categoriesbillet/evenement/:id', (req, res)=>{
 })
 
 // Lister les evenements onspot
-app.get('/onspot', (req, res) => {
-    const query = 'SELECT * FROM evenements WHERE onspot=1';
+// app.get('/onspot', (req, res) => {
+//     const query = 'SELECT * FROM evenements WHERE onspot=1';
   
-    con.query(query, (err, rows) => {
-      if (err) {
-        console.error('Erreur lors de l\'exécution de la requête :', err);
-        res.status(500).json({ error: 'Erreur serveur' });
-        return;
-      }
+//     con.query(query, (err, rows) => {
+//       if (err) {
+//         console.error('Erreur lors de l\'exécution de la requête :', err);
+//         res.status(500).json({ error: 'Erreur serveur' });
+//         return;
+//       }
   
-      // Formatage des dates au format "JJ-MM-AAAA HH-MM"
-      const formattedRows = rows.map(row => {
-        const formattedDate = moment(row.date).format('DD-MM-YYYY à HH:mm');
-        return { ...row, date: formattedDate };
-      });
+//       // Formatage des dates au format "JJ-MM-AAAA HH-MM"
+//       const formattedRows = rows.map(row => {
+//         const formattedDate = moment(row.date).format('DD-MM-YYYY à HH:mm');
+//         return { ...row, date: formattedDate };
+//       });
   
-      res.json(formattedRows);
-    });
-  });
+//       res.json(formattedRows);
+//     });
+//   });
 
   app.put('/update/retrait/:id', (req, res)=>{
 
