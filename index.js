@@ -156,6 +156,30 @@ app.post('/api/login', (req, res) => {
 // Pour déconnecter un utilisateur avec JWT, vous devez gérer cela côté client en supprimant le JWT stocké.
 
 // Ressource protégée route
+
+app.get("/export-db", (req, res) => {
+  const fileName = `backup_${Date.now()}.sql`;
+  const filePath = path.join(__dirname, fileName);
+
+  // 📌 Commande mysqldump pour exporter la base
+  const dumpCommand = `mysqldump -h ${con.host} -u ${con.user} --password=${con.password} ${con.database} > ${filePath}`;
+
+  exec(dumpCommand, (error) => {
+    if (error) {
+      console.error("Erreur lors de l'exportation:", error);
+      return res.status(500).send("Erreur lors de l'exportation de la base de données");
+    }
+
+    res.download(filePath, fileName, (err) => {
+      if (err) {
+        console.error("Erreur lors du téléchargement:", err);
+      }
+    });
+  });
+});
+
+
+
 app.get('/api/protected', (req, res) => {
   const token = req.headers.authorization;
 
