@@ -683,6 +683,7 @@ app.post("/api/transaction", async (req, res) => {
 
     const response = await axios.post(API_URL, transactionData, { headers });
 
+    console.log(response.data)
     res.json(response.data);
       
     
