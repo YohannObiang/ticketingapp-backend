@@ -320,7 +320,7 @@ app.get('/categoriesbillet/evenement/:id', (req, res)=>{
     })
 })
 
-Lister les evenements onspot
+//Lister les evenements onspot
 app.get('/onspot', (req, res) => {
     const query = 'SELECT * FROM evenements WHERE onspot=1';
   
